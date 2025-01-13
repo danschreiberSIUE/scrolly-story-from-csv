@@ -1,6 +1,7 @@
 let main = null;
 let scrolly = null;
 let stickyImage = null;
+let prevStickyImage = null;
 let stickyMap = null;
 let story = null;
 let steps = null;
@@ -99,8 +100,11 @@ function handleStepEnter(response) {
 function replaceStepContent(stepData) {
   // Swap out image or map based on meta data
   if (stepData.contentType === "image") {
-    if (stepData.filePath) {
+    // only replace the <img> tag if the image has changed, to allow for smooth transitions
+    if (stepData.filePath && prevStickyImage != stepData.filePath) {
       stickyImage.innerHTML = `<img src="${stepData.filePath}" alt="Image Alt Text" />`;
+      prevStickyImage = stepData.filePath;
+
       stickyImage.style.display = "block"; // TODO Move to CSS, create an active/inactive class
       stickyMap.style.display = "none";
     }
@@ -121,7 +125,7 @@ function initScrollama() {
   scroller
     .setup({
       step: "#scrolly-container article .step",
-      offset: 0.7, // what % from the top of the viewport the step should be considered "entered"
+      offset: 0.5, // what % from the top of the viewport the step should be considered "entered"
       debug: false,
     })
     .onStepEnter(handleStepEnter);
